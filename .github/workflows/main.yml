@@ -26,6 +26,7 @@ jobs:
 
     - name: Build the game
       run: |
+        ls $GITHUB_WORKSPACE
         python -m pygbag --build $GITHUB_WORKSPACE/src
 
     - name: Deploy to GitHub Pages
