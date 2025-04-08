@@ -27,7 +27,7 @@ jobs:
     - name: Build the game
       run: |       
         python -m pygbag --build $GITHUB_WORKSPACE/src/main.py
-    -name:  debug
+    - name: debug
       run: |
         ls $GITHUB_WORKSPACE/src/
         ls $GITHUB_WORKSPACE/src/build
