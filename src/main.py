@@ -11,7 +11,7 @@ from load_global_variables import *
 
 pygame.init()
 pygame.mixer.init()
-pygame.mixer.music.load("./sonidos/Peaceful Oasis (cdef6aa6cf2f4941a19c48303fa7c8e8).mp3")
+pygame.mixer.music.load("./sonidos/music_background_1.ogg")
 pygame.mixer.music.play(-1)
 font = pygame.font.SysFont(FONT_NAME, 30)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
