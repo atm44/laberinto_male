@@ -29,7 +29,9 @@ jobs:
         python -m pygbag --build $GITHUB_WORKSPACE/src/main.py
     - name: debug
       run: |
-        ls $GITHUB_WORKSPACE/src/build/web
+        ls -la $GITHUB_WORKSPACE/src/build/web
+        echo "head"
+        head $GITHUB_WORKSPACE/src/build/web/index.html
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@4.1.7
       with:
