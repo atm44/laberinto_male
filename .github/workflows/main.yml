@@ -26,8 +26,8 @@ jobs:
 
     - name: Build the game
       run: |
-        ls $GITHUB_WORKSPACE
-        python -m pygbag --build $GITHUB_WORKSPACE/src
+        ls $GITHUB_WORKSPACE/src/
+        python -m pygbag --build $GITHUB_WORKSPACE/src/main.py
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@4.1.7
