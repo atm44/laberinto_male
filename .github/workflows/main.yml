@@ -25,10 +25,13 @@ jobs:
         pip install pygame
 
     - name: Build the game
+      run: |       
+        python -m pygbag --build $GITHUB_WORKSPACE/src/main.py
+    -name:  debug
       run: |
         ls $GITHUB_WORKSPACE/src/
-        python -m pygbag --build $GITHUB_WORKSPACE/src/main.py
-
+        ls $GITHUB_WORKSPACE/src/build
+        ls $GITHUB_WORKSPACE/src/build/web
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@4.1.7
       with:
