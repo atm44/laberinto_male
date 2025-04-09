@@ -1,6 +1,7 @@
 from load_global_variables import *
 from MazeGame import *
 from win_screen import *
+import asyncio
 
 def game_loop(width, height, player_name,selected_player,exit_img,victory_img,clock):
     global screen
@@ -15,6 +16,7 @@ def game_loop(width, height, player_name,selected_player,exit_img,victory_img,cl
     while not win:
         game.draw(screen, player_name,0,window_height - 40,selected_player)
         pygame.display.flip()
+        await asyncio.sleep(0)  # Give control back to the main thread
         clock.tick(30)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

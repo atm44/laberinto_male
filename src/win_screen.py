@@ -27,7 +27,7 @@ def win_screen(clock,victory_img):
         draw_button(btn_back, "Volver al Menu",screen)
 
         pygame.display.flip()
-
+        await asyncio.sleep(0)  # Give control back to the main thread
         # Lógica de animación
         scale += scale_speed * direction
         if scale >= max_scale or scale <= min_scale:

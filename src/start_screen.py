@@ -39,6 +39,7 @@ def start_screen(clock,logo_img):
         draw_button(btn_exit, "Salir",screen)
 
         pygame.display.flip()
+        await asyncio.sleep(0)  # Give control back to the main thread
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()

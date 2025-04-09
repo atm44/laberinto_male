@@ -33,6 +33,7 @@ def select_character_screen(clock):
             screen.blit(img, rect)
 
         pygame.display.flip()
+        await asyncio.sleep(0)  # Give control back to the main thread
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
