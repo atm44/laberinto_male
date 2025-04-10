@@ -25,15 +25,11 @@ jobs:
 
     - name: Build the game
       run: |       
-        python -m pygbag --build $GITHUB_WORKSPACE/src/main.py
-    - name: debug
-      run: |
-        ls -la $GITHUB_WORKSPACE/src/build/web
-        echo "head"
-        head $GITHUB_WORKSPACE/src/build/web/index.html
+        python -m pygbag --build $GITHUB_WORKSPACE/laberinto/main.py
+
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@4.1.7
       with:
         branch: gh-pages
-        folder: src/build/web
+        folder: build/web
         token: ${{ secrets.PAT }}
