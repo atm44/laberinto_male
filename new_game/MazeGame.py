@@ -6,8 +6,8 @@ class MazeGame:
     def __init__(self,game):
         self.game = game
 
-        window_width = game.width * CELL_SIZE  
-        window_height = game.height * CELL_SIZE + 40 # espacio para el texto arriba
+        self.window_width = game.width * CELL_SIZE  
+        self.window_height = game.height * CELL_SIZE + 40 # espacio para el texto arriba
         
         self.cols = self.game.height if self.game.height % 2 == 1 else self.game.height + 1
         self.rows = self.game.width if self.game.width % 2 == 1 else self.game.width + 1
@@ -19,7 +19,7 @@ class MazeGame:
         self.coins = set()
         self.generate_maze()
         self.spawn_coins(10)
-        self.game.screen = pygame.display.set_mode((window_width, window_height))
+
         
         
 
@@ -72,6 +72,7 @@ class MazeGame:
         self.coins = set(random.sample(empty_spaces, min(amount, len(empty_spaces))))
 
     def draw(self):
+        self.game.screen = pygame.display.set_mode((self.window_width, self.window_height))
         self.game.screen.fill(BLACK)
         for row in range(self.rows):
             for col in range(self.cols):
@@ -93,7 +94,7 @@ class MazeGame:
         # Dibujar nombre y puntuación
         score_text = f"{self.game.name}: {self.score}"
         score_text_size = 20
-        draw_text(score_text,score_text_size,WHITE,(score_text_size*2,SCREEN_HEIGHT-score_text_size/2),self.game.screen) 
+        draw_text(score_text,score_text_size,WHITE,(score_text_size,SCREEN_HEIGHT-score_text_size),self.game.screen,aligment="left") 
         pygame.display.flip()
 
     def move_player(self, dx, dy):
