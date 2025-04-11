@@ -20,12 +20,37 @@ class MazeGame:
         self.generate_maze()
         self.spawn_coins(10)
 
+        self.orientation = "right"
+        # Agregar una variable de velocidad configurable
+        self.speed = 1  # Velocidad del jugador (puedes ajustar este valor)
+
+        # Inicializar un diccionario para rastrear teclas presionadas
+        self.keys_pressed = {
+            pygame.K_UP: False,
+            pygame.K_DOWN: False,
+            pygame.K_LEFT: False,
+            pygame.K_RIGHT: False,
+        }
         
-        
+    def blit_player(self,rect):
+        if self.orientation == "right":
+            self.game.screen.blit(self.game.selected_player, rect)
+        elif self.orientation == "left":
+            self.game.screen.blit(pygame.transform.flip(self.game.selected_player, True, False), rect)    
+    def trigger_movement(self):
+        # Actualizar la posición del jugador según las teclas presionadas
+        if self.keys_pressed[pygame.K_UP]:
+            self.move_player(0, -self.speed)
+        elif self.keys_pressed[pygame.K_DOWN]:
+            self.move_player(0, self.speed)
+        elif self.keys_pressed[pygame.K_LEFT]:
+            self.move_player(-self.speed, 0)
+            self.orientation = "right"
+        elif self.keys_pressed[pygame.K_RIGHT]:
+            self.move_player(self.speed, 0)
+            self.orientation = "left"
 
     def game_loop(self):   
-
-
         self.draw()
         pygame.display.flip()
         
@@ -35,14 +60,16 @@ class MazeGame:
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    self.move_player(0, -1)
-                elif event.key == pygame.K_DOWN:
-                    self.move_player(0, 1)
-                elif event.key == pygame.K_LEFT:
-                    self.move_player(-1, 0)
-                elif event.key == pygame.K_RIGHT:
-                    self.move_player(1, 0)
+                if event.key in self.keys_pressed:
+                    self.keys_pressed[event.key] = True
+                    
+            elif event.type == pygame.KEYUP:
+                if event.key in self.keys_pressed:
+                    self.keys_pressed[event.key] = False
+                    self.trigger_movement()
+        self.game.clock.tick(15)  # Controlar la velocidad del juego
+        self.trigger_movement()
+
 
         if tuple(self.player) == self.exit:
             self.game.current_screen = WinScreen(self.game)
@@ -79,7 +106,8 @@ class MazeGame:
                 rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
                 if (row, col) == tuple(self.player):
                     pygame.draw.rect(self.game.screen, GRAY, rect)
-                    self.game.screen.blit(self.game.selected_player, (col * CELL_SIZE,row * CELL_SIZE))
+                    self.blit_player(rect)
+                    # self.game.screen.blit(self.game.selected_player, (col * CELL_SIZE,row * CELL_SIZE))
                 elif (row, col) == self.exit:
 
                     pygame.draw.rect(self.game.screen, GRAY, rect)
@@ -94,7 +122,7 @@ class MazeGame:
         # Dibujar nombre y puntuación
         score_text = f"{self.game.name}: {self.score}"
         score_text_size = 20
-        draw_text(score_text,score_text_size,WHITE,(score_text_size,SCREEN_HEIGHT-score_text_size),self.game.screen,aligment="left") 
+        draw_text(score_text,score_text_size,WHITE,(score_text_size,self.window_height-score_text_size),self.game.screen,aligment="midleft") 
         pygame.display.flip()
 
     def move_player(self, dx, dy):
