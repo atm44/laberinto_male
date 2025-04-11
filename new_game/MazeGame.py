@@ -67,7 +67,7 @@ class MazeGame:
                 if event.key in self.keys_pressed:
                     self.keys_pressed[event.key] = False
                     self.trigger_movement()
-        self.game.clock.tick(15)  # Controlar la velocidad del juego
+        self.game.clock.tick(11)  # Controlar la velocidad del juego
         self.trigger_movement()
 
 
