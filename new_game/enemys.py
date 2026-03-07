@@ -43,6 +43,7 @@ class Enemy:
         """
         if self.rect.colliderect(player.rect):
             self.game.score -= 100  # El jugador pierde 100 puntos
+            player.lose_life()  # Perder una vida
 
     def blit(self, screen):
         """Dibuja la imagen del enemigo en la pantalla."""

@@ -47,6 +47,11 @@ class MazeGame:
         # Procesar movimiento continuo
         self.player.process_movement()
         
+        # Verificar si el jugador está vivo
+        if not self.player.is_alive():
+            self.game.current_screen = self.game.start_screen
+            return
+        
         # Verificar si llegó a la salida
         if tuple(self.player.get_position_grid()) == self.exit:
             self.game.current_screen = WinScreen(self.game)
@@ -117,10 +122,32 @@ class MazeGame:
         score_text = f"{self.game.name}: {self.game.score}"
         score_text_size = 20
         draw_text(score_text, score_text_size, WHITE, (score_text_size, self.window_height - score_text_size), self.game.screen, aligment="midleft")
+        
+        # Dibujar vidas (corazones) en la esquina inferior derecha
+        self.draw_lives()
 
     def check_coin_collection(self):
         """Verificar si el jugador recolectó monedas."""
         player_pos = tuple(self.player.get_position_grid())
         if player_pos in self.coins:
             self.coins.remove(player_pos)
-            self.game.score += 100
+            # Asegurar que el puntaje no sea negativo
+            self.game.score = max(0, self.game.score + 100)
+    
+    def draw_lives(self):
+        """Dibujar vidas (corazones) en la esquina inferior derecha."""
+        lives = self.player.get_lives()
+        heart_size = 30
+        spacing = 5
+        
+        # Posición inicial (esquina inferior derecha)
+        start_x = self.window_width - (heart_size + spacing) * 3 - 10
+        start_y = self.window_height - heart_size - 10
+        
+        # Dibujar tantos corazones como vidas tenga
+        for i in range(lives):
+            x = start_x + i * (heart_size + spacing)
+            y = start_y
+            # Dibujar corazón escalado
+            heart_img = pygame.transform.scale(self.game.victory_img, (heart_size, heart_size))
+            self.game.screen.blit(heart_img, (x, y))

@@ -32,6 +32,10 @@ class Player:
         self.speed = 1
         self.orientation = "right"  # "right" o "left"
         
+        # Sistema de vidas
+        self.lives = 3
+        self.last_collision_time = 0  # Evitar colisiones múltiples rápidas
+        
         # Input
         self.keys_pressed = {
             pygame.K_UP: False,
@@ -89,7 +93,7 @@ class Player:
     def collect_coin(self, coin_pos):
         """Recoger una moneda."""
         if tuple(self.position) == coin_pos:
-            self.game.score += 100
+            self.game.score = max(0, self.game.score + 100)  # Asegurar que no sea negativo
             return True
         return False
     
@@ -120,3 +124,22 @@ class Player:
     def get_position_pixel(self):
         """Obtener posición en píxeles (x, y)."""
         return (self.rect.x, self.rect.y)
+    
+    def lose_life(self):
+        """Perder una vida (con cooldown para evitar múltiples colisiones rápidas)."""
+        import time
+        current_time = time.time()
+        # Cooldown de 1 segundo entre colisiones
+        if current_time - self.last_collision_time > 1.0:
+            self.lives = max(0, self.lives - 1)
+            self.last_collision_time = current_time
+            return True
+        return False
+    
+    def is_alive(self):
+        """Verificar si el jugador sigue vivo."""
+        return self.lives > 0
+    
+    def get_lives(self):
+        """Obtener número de vidas."""
+        return self.lives
