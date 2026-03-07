@@ -2,6 +2,8 @@ import random
 from load_global_variables import *
 from ui_helpers import *
 from win_screen import WinScreen
+from enemys import GhostBasic
+
 class MazeGame:
     def __init__(self,game):
         self.game = game
@@ -15,7 +17,6 @@ class MazeGame:
         self.start = (1, 1)
         self.exit = (self.rows - 2, self.cols - 2)
         self.player = list(self.start)
-        self.score = 0
         self.coins = set()
         self.generate_maze()
         self.spawn_coins(10)
@@ -31,6 +32,10 @@ class MazeGame:
             pygame.K_LEFT: False,
             pygame.K_RIGHT: False,
         }
+
+        # Crear una lista para almacenar enemigos
+        self.enemies = []
+        self.spawn_enemies(5)  # Generar 5 enemigos como ejemplo
         
     def blit_player(self,rect):
         if self.orientation == "right":
@@ -52,6 +57,7 @@ class MazeGame:
 
     def game_loop(self):   
         self.draw()
+        self.update_enemies()  # Actualizar enemigos
         pygame.display.flip()
         
 
@@ -67,13 +73,28 @@ class MazeGame:
                 if event.key in self.keys_pressed:
                     self.keys_pressed[event.key] = False
                     self.trigger_movement()
-        self.game.clock.tick(11)  # Controlar la velocidad del juego
         self.trigger_movement()
-
-
+        
+        
         if tuple(self.player) == self.exit:
             self.game.current_screen = WinScreen(self.game)
 
+    def spawn_enemies(self, amount):
+        """Genera una cantidad específica de enemigos en posiciones aleatorias."""
+        for _ in range(amount):
+            while True:
+                x = random.randint(1, self.cols - 2)
+                y = random.randint(1, self.rows - 2)
+                if self.maze[y][x] == ' ' and (y, x) != tuple(self.player) and (y, x) != self.exit:
+                    enemy = GhostBasic(self.game, x, y, self.game.basic_ghost_img_path)
+                    self.enemies.append(enemy)
+                    break
+
+    def update_enemies(self):
+        """Actualiza la posición y renderiza a los enemigos."""
+        for enemy in self.enemies:
+            enemy.move()
+            enemy.blit(self.game.screen)
 
     def generate_maze(self):
         def carve(x, y):
@@ -99,7 +120,6 @@ class MazeGame:
         self.coins = set(random.sample(empty_spaces, min(amount, len(empty_spaces))))
 
     def draw(self):
-        self.game.screen = pygame.display.set_mode((self.window_width, self.window_height))
         self.game.screen.fill(BLACK)
         for row in range(self.rows):
             for col in range(self.cols):
@@ -120,10 +140,9 @@ class MazeGame:
                     pygame.draw.rect(self.game.screen, GRAY, rect)
 
         # Dibujar nombre y puntuación
-        score_text = f"{self.game.name}: {self.score}"
+        score_text = f"{self.game.name}: {self.game.score}"
         score_text_size = 20
-        draw_text(score_text,score_text_size,WHITE,(score_text_size,self.window_height-score_text_size),self.game.screen,aligment="midleft") 
-        pygame.display.flip()
+        draw_text(score_text,score_text_size,WHITE,(score_text_size,self.window_height-score_text_size),self.game.screen,aligment="midleft")
 
     def move_player(self, dx, dy):
         
@@ -136,4 +155,4 @@ class MazeGame:
             self.player = [new_y, new_x]
             if tuple(self.player) in self.coins:
                 self.coins.remove(tuple(self.player))
-                self.score += 100
+                self.game.score += 100

@@ -7,6 +7,10 @@ class GameLoop:
         self.active = False
         self.input_box = pygame.Rect(20, 120, 200, 36)
         self.game = MazeGame(global_game)
+        # Redimensionar pantalla para el juego del laberinto (UNA SOLA VEZ)
+        self.game.global_game.screen = pygame.display.set_mode(
+            (self.game.window_width, self.game.window_height)
+        )
     
     def render(self):
         self.game.game_loop()

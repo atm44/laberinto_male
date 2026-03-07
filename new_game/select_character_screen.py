@@ -24,6 +24,7 @@ class SelectCharacterScreen:
             (320, 200),
             (480, 200)
         ]
+        self.game_loop = None
 
     def render(self):    
         self.game.screen.fill(BLACK)
@@ -46,7 +47,7 @@ class SelectCharacterScreen:
                     rect = self.characters_selection[i].get_rect(center=pos)
                     if rect.collidepoint(event.pos):
                         self.game.selected_player = self.characters_players[i]
-                        self.game.current_screen = GameLoop(self.game)                        
-        
-        # clock.tick(60)
+                        if self.game_loop is None:
+                            self.game_loop = GameLoop(self.game)
+                        self.game.current_screen = self.game_loop
 

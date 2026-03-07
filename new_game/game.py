@@ -1,13 +1,6 @@
-# Third-party imports
-import asyncio
-from copy import deepcopy
-import math
 import os
-from random import choice, randint
-from typing import Any
 import pygame
-# from pygame_emojis import load_emoji
-import sys
+
 
 from load_global_variables import *
 from start_screen import StartScreen    
@@ -26,39 +19,40 @@ class Game():
         # ----- initialize pygame
         pygame.init()
         pygame.mixer.init()
+        pygame.display.set_caption("Laberinto de Male")
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         music_backgroud_path = os.path.join(self.snd_folder,"music_background_1.ogg")
         print(f"{music_backgroud_path=}")
         pygame.mixer.music.load(music_backgroud_path)
         pygame.mixer.music.play(-1)
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         
         self.victory_img = pygame.image.load(os.path.join(self.img_folder,"corazon.png")).convert_alpha()
         self.logo_img = pygame.image.load(os.path.join(self.img_folder,"cara_male_editada.png")).convert_alpha()
         exit_img = pygame.image.load(os.path.join(self.img_folder,"pokeball.png")).convert_alpha()
-
+        self.basic_ghost_img_path = os.path.join(self.img_folder,"gastly.png")       
         self.exit_img = pygame.transform.scale(exit_img, (CELL_SIZE, CELL_SIZE))
 
         self.width = 15
         self.height = 15
         self.name = ""
+        self.score = 0
         self.start_screen = StartScreen(self)
         self.current_screen = self.start_screen 
         self.selected_player = None
 
 
-    async def run(self) -> None:
+    def run(self) -> None:
         """
-        Running the game in Pygame mode means continuous cycles.
-        The logic is different and a bit more complicated.
+        Running the game in local Pygame mode with a synchronous main loop.
         """
-
-
-        while True:
-            # ----- checking for any event like key presses
-            # self.check_events()
-            # self.main_game_loop(10, 10)
-            self.current_screen.render()
-            await asyncio.sleep(0)
+        running = True
+        while running:
+            try:
+                self.current_screen.render()
+                self.clock.tick(60)  # Control FPS global a 60 FPS
+            except SystemExit:
+                running = False
+                break
 
 
 

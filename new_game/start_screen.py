@@ -9,10 +9,13 @@ class StartScreen:
         self.name = ""
         self.active = False
         self.input_box = pygame.Rect(20, 120, 200, 36)
+        self.select_character_screen = SelectCharacterScreen(self.game)
 
     def render(self):
-        self.game.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        select_character_screen = SelectCharacterScreen(self.game)
+        # Redimensionar pantalla al tamaño original (UNA SOLA VEZ por pantalla)
+        if self.game.screen.get_size() != (SCREEN_WIDTH, SCREEN_HEIGHT):
+            self.game.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        
         # Llenar la pantalla con color blanco
         self.game.screen.fill(WHITE)
 
@@ -69,20 +72,20 @@ class StartScreen:
                     self.game.width = 15
                     self.game.height = 15
                     self.game.name = self.name
-                    self.game.current_screen = select_character_screen
+                    self.game.current_screen = self.select_character_screen
                     
                 
                 elif btn_medium.collidepoint(event.pos) and self.name:
                     self.game.width = 21
                     self.game.height = 21
                     self.game.name = self.name
-                    self.game.current_screen = select_character_screen
+                    self.game.current_screen = self.select_character_screen
 
                 elif btn_large.collidepoint(event.pos) and self.name:
                     self.game.width = 31
                     self.game.height = 31
                     self.game.name = self.name
-                    self.game.current_screen = select_character_screen
+                    self.game.current_screen = self.select_character_screen
 
 
                 elif btn_exit.collidepoint(event.pos):
@@ -96,5 +99,3 @@ class StartScreen:
                 else:
                     if len(self.name) < 12:
                         self.name += event.unicode
-
-        # self.game.clock.tick(30)

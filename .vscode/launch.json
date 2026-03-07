@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Ejecutar main.py (nativo)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/new_game/main.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: Ejecutar pygbag (módulo)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pygbag",
+      "args": ["main.py"],
+      "cwd": "${workspaceFolder}/new_game",
+      "console": "integratedTerminal"
+    }
+  ]
+}
