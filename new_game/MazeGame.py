@@ -3,89 +3,62 @@ from load_global_variables import *
 from ui_helpers import *
 from win_screen import WinScreen
 from enemys import GhostBasic
+from player import Player
 
 class MazeGame:
-    def __init__(self,game):
+    def __init__(self, game):
         self.game = game
 
         self.window_width = game.width * CELL_SIZE  
-        self.window_height = game.height * CELL_SIZE + 40 # espacio para el texto arriba
+        self.window_height = game.height * CELL_SIZE + 40  # espacio para el texto arriba
         
         self.cols = self.game.height if self.game.height % 2 == 1 else self.game.height + 1
         self.rows = self.game.width if self.game.width % 2 == 1 else self.game.width + 1
         self.maze = [['#'] * self.cols for _ in range(self.rows)]
         self.start = (1, 1)
         self.exit = (self.rows - 2, self.cols - 2)
-        self.player = list(self.start)
         self.coins = set()
+        
+        # Generar laberinto
         self.generate_maze()
         self.spawn_coins(10)
 
-        self.orientation = "right"
-        # Agregar una variable de velocidad configurable
-        self.speed = 1  # Velocidad del jugador (puedes ajustar este valor)
-
-        # Inicializar un diccionario para rastrear teclas presionadas
-        self.keys_pressed = {
-            pygame.K_UP: False,
-            pygame.K_DOWN: False,
-            pygame.K_LEFT: False,
-            pygame.K_RIGHT: False,
-        }
+        # Crear jugador
+        self.player = Player(game, self.maze, self.start, game.selected_player)
 
         # Crear una lista para almacenar enemigos
         self.enemies = []
-        self.spawn_enemies(5)  # Generar 5 enemigos como ejemplo
-        
-    def blit_player(self,rect):
-        if self.orientation == "right":
-            self.game.screen.blit(self.game.selected_player, rect)
-        elif self.orientation == "left":
-            self.game.screen.blit(pygame.transform.flip(self.game.selected_player, True, False), rect)    
-    def trigger_movement(self):
-        # Actualizar la posición del jugador según las teclas presionadas
-        if self.keys_pressed[pygame.K_UP]:
-            self.move_player(0, -self.speed)
-        elif self.keys_pressed[pygame.K_DOWN]:
-            self.move_player(0, self.speed)
-        elif self.keys_pressed[pygame.K_LEFT]:
-            self.move_player(-self.speed, 0)
-            self.orientation = "right"
-        elif self.keys_pressed[pygame.K_RIGHT]:
-            self.move_player(self.speed, 0)
-            self.orientation = "left"
+        self.spawn_enemies(5)  # Generar 5 enemigos como ejemplo    
 
     def game_loop(self):   
         self.draw()
         self.update_enemies()  # Actualizar enemigos
+        self.check_coin_collection()  # Verificar monedas
         pygame.display.flip()
         
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key in self.keys_pressed:
-                    self.keys_pressed[event.key] = True
-                    
-            elif event.type == pygame.KEYUP:
-                if event.key in self.keys_pressed:
-                    self.keys_pressed[event.key] = False
-                    self.trigger_movement()
-        self.trigger_movement()
+            else:
+                # Pasar evento al jugador
+                self.player.handle_input(event)
         
+        # Procesar movimiento continuo
+        self.player.process_movement()
         
-        if tuple(self.player) == self.exit:
+        # Verificar si llegó a la salida
+        if tuple(self.player.get_position_grid()) == self.exit:
             self.game.current_screen = WinScreen(self.game)
 
     def spawn_enemies(self, amount):
         """Genera una cantidad específica de enemigos en posiciones aleatorias."""
+        player_pos = tuple(self.player.get_position_grid())
         for _ in range(amount):
             while True:
                 x = random.randint(1, self.cols - 2)
                 y = random.randint(1, self.rows - 2)
-                if self.maze[y][x] == ' ' and (y, x) != tuple(self.player) and (y, x) != self.exit:
+                if self.maze[y][x] == ' ' and (y, x) != player_pos and (y, x) != self.exit:
                     enemy = GhostBasic(self.game, x, y, self.game.basic_ghost_img_path)
                     self.enemies.append(enemy)
                     break
@@ -94,6 +67,7 @@ class MazeGame:
         """Actualiza la posición y renderiza a los enemigos."""
         for enemy in self.enemies:
             enemy.move()
+            enemy.check_collision_with_player(self.player)
             enemy.blit(self.game.screen)
 
     def generate_maze(self):
@@ -121,17 +95,17 @@ class MazeGame:
 
     def draw(self):
         self.game.screen.fill(BLACK)
+        player_pos = tuple(self.player.get_position_grid())
+        
         for row in range(self.rows):
             for col in range(self.cols):
                 rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-                if (row, col) == tuple(self.player):
+                if (row, col) == player_pos:
                     pygame.draw.rect(self.game.screen, GRAY, rect)
-                    self.blit_player(rect)
-                    # self.game.screen.blit(self.game.selected_player, (col * CELL_SIZE,row * CELL_SIZE))
+                    self.player.draw(self.game.screen)
                 elif (row, col) == self.exit:
-
                     pygame.draw.rect(self.game.screen, GRAY, rect)
-                    self.game.screen.blit(self.game.exit_img, (col * CELL_SIZE,row * CELL_SIZE))
+                    self.game.screen.blit(self.game.exit_img, (col * CELL_SIZE, row * CELL_SIZE))
                 elif (row, col) in self.coins:
                     pygame.draw.circle(self.game.screen, (255, 215, 0), rect.center, CELL_SIZE // 3)
                 elif self.maze[row][col] == '#':
@@ -142,17 +116,11 @@ class MazeGame:
         # Dibujar nombre y puntuación
         score_text = f"{self.game.name}: {self.game.score}"
         score_text_size = 20
-        draw_text(score_text,score_text_size,WHITE,(score_text_size,self.window_height-score_text_size),self.game.screen,aligment="midleft")
+        draw_text(score_text, score_text_size, WHITE, (score_text_size, self.window_height - score_text_size), self.game.screen, aligment="midleft")
 
-    def move_player(self, dx, dy):
-        
-        new_y = self.player[0] + dy
-        new_x = self.player[1] + dx
-
-        # print(f'Moving player to ({new_x}, {new_y})')
-        # print(f'maze type:{self.maze[new_y][new_x]}')
-        if self.maze[new_y][new_x] != '#':
-            self.player = [new_y, new_x]
-            if tuple(self.player) in self.coins:
-                self.coins.remove(tuple(self.player))
-                self.game.score += 100
+    def check_coin_collection(self):
+        """Verificar si el jugador recolectó monedas."""
+        player_pos = tuple(self.player.get_position_grid())
+        if player_pos in self.coins:
+            self.coins.remove(player_pos)
+            self.game.score += 100

@@ -47,7 +47,6 @@ class SelectCharacterScreen:
                     rect = self.characters_selection[i].get_rect(center=pos)
                     if rect.collidepoint(event.pos):
                         self.game.selected_player = self.characters_players[i]
-                        if self.game_loop is None:
-                            self.game_loop = GameLoop(self.game)
+                        self.game_loop = GameLoop(self.game)
                         self.game.current_screen = self.game_loop
 
