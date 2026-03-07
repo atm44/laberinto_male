@@ -2,6 +2,7 @@ import random
 from load_global_variables import *
 from ui_helpers import *
 from win_screen import WinScreen
+from game_over_screen import GameOverScreen
 from enemys import GhostBasic
 from player import Player
 
@@ -49,7 +50,7 @@ class MazeGame:
         
         # Verificar si el jugador está vivo
         if not self.player.is_alive():
-            self.game.current_screen = self.game.start_screen
+            self.game.current_screen = GameOverScreen(self.game)
             return
         
         # Verificar si llegó a la salida
