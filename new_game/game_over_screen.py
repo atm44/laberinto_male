@@ -10,54 +10,14 @@ class GameOverScreen:
     def __init__(self, game):
         self.game = game
         
-        # Crear la imagen del corazón roto (pixel art estilo 90s)
-        self.broken_heart_img = self.create_broken_heart_image()
+        # Cargar la imagen del corazón roto
+        self.broken_heart_img = pygame.image.load("images/corazon_roto.png")
         
         # Animación
         self.direction = 1
         self.scale = 1.0
         self.scale_speed = 0.03
     
-    def create_broken_heart_image(self):
-        """Crear imagen de corazón roto estilo pixel art (200x200)."""
-        size = 200
-        heart_img = pygame.Surface((size, size), pygame.SRCALPHA)
-        
-        # Colores
-        RED = (200, 0, 0)
-        DARK_RED = (100, 0, 0)
-        
-        # Dibujar corazón roto (dos mitades separadas con grietas)
-        # Mitad izquierda (roja oscura)
-        pygame.draw.polygon(heart_img, DARK_RED, [
-            (50, 80),   # Top left
-            (100, 50),  # Top middle
-            (100, 110), # Middle
-            (50, 140),  # Bottom left
-            (30, 120),  # Left point
-        ])
-        
-        # Mitad derecha (roja clara)
-        pygame.draw.polygon(heart_img, RED, [
-            (100, 110), # Middle
-            (150, 140), # Bottom right
-            (170, 120), # Right point
-            (100, 50),  # Top middle
-            (150, 80),  # Top right
-        ])
-        
-        # Grieta en el medio
-        pygame.draw.line(heart_img, (50, 0, 0), (100, 50), (100, 140), 3)
-        
-        # Pequeños píxeles rotos alrededor
-        broken_pixels = [
-            (95, 110), (105, 110), (98, 105), (102, 115),
-            (90, 120), (110, 120), (85, 115), (115, 125)
-        ]
-        for px, py in broken_pixels:
-            pygame.draw.rect(heart_img, DARK_RED, (px, py, 4, 4))
-        
-        return heart_img
     
     def render(self):
         """Renderizar pantalla de Game Over."""
@@ -84,11 +44,11 @@ class GameOverScreen:
         screen.blit(scaled_heart, heart_rect)
         
         # Dibujar información del jugador
-        draw_text(f"Jugador: {self.game.name}", 24, WHITE, (SCREEN_WIDTH // 2, 360), screen)
-        draw_text(f"Puntuación Final: {self.game.score}", 28, BLUE, (SCREEN_WIDTH // 2, 410), screen)
+        draw_text(f"Jugador: {self.game.name}", 24, WHITE, (SCREEN_WIDTH // 2, SCREEN_HEIGHT-200), screen)
+        draw_text(f"Puntuación Final: {self.game.score}", 28, BLUE, (SCREEN_WIDTH // 2, SCREEN_HEIGHT-40), screen)
         
         # Botón volver al menú
-        btn_menu = pygame.Rect(SCREEN_WIDTH // 2 - 100, 460, 200, 50)
+        btn_menu = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT-120, 200, 50)
         draw_button(btn_menu, "Volver al Menú", screen)
         
         pygame.display.flip()
