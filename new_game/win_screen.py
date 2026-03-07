@@ -7,8 +7,8 @@ class WinScreen:
 
         # Animación: variables
         self.direction = 1
-        self.scale = 1.0
-        self.scale_speed = 0.2
+        self.scale = 1
+        self.scale_speed = 0.02
 
     def render(self):
         # Redimensionar pantalla al tamaño original
@@ -24,10 +24,12 @@ class WinScreen:
 
         # Animar la imagen (agrandar y achicar)
         min_scale = 0.5
-        max_scale = 1.5
+        max_scale = 3
         scaled_size = int(0.25 * SCREEN_WIDTH * self.scale)
         img = pygame.transform.smoothscale(victory_img, (scaled_size, scaled_size))
         img_rect = img.get_rect(center=(320, 200))
+        # print(self.scale)
+        # print(self.direction)
         screen.blit(img, img_rect)
 
         # Botón volver
@@ -47,6 +49,9 @@ class WinScreen:
 
         # Lógica de animación
         self.scale += self.scale_speed * self.direction
-        if self.scale >= max_scale or self.scale <= min_scale:
-            self.scale_speed *= -1
-        self.direction *= -1
+        if self.scale >= max_scale:
+            self.scale = max_scale
+            self.direction *= -1
+        elif self.scale <= min_scale:
+            self.scale = min_scale    
+            self.direction *= -1

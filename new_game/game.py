@@ -49,7 +49,7 @@ class Game():
         while running:
             try:
                 self.current_screen.render()
-                self.clock.tick(60)  # Control FPS global a 60 FPS
+                self.clock.tick(20)  # Control FPS global a 20 FPS
             except SystemExit:
                 running = False
                 break
