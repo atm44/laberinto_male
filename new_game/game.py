@@ -36,6 +36,7 @@ class Game():
         self.height = 15
         self.name = ""
         self.score = 0
+        self.maze = None  # Laberinto actual (se establece cuando entra en MazeGame)
         self.start_screen = StartScreen(self)
         self.current_screen = self.start_screen 
         self.selected_player = None

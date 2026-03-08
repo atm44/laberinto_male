@@ -22,6 +22,10 @@ class MazeGame:
         
         # Generar laberinto
         self.generate_maze()
+        
+        # Establecer el laberinto en el objeto game (para acceso desde enemigos)
+        self.game.maze = self.maze
+        
         self.spawn_coins(10)
 
         # Crear jugador

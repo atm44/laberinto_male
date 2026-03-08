@@ -1,12 +1,13 @@
 import random
 import pygame
 from load_global_variables import *
+from motor_inteligencia_movimiento import RandomTraversal, TargetSeeker
 
 
 class Enemy:
     """Clase base para enemigos."""
     
-    def __init__(self, game, x, y, image_path):
+    def __init__(self, game, x, y, image_path, motor_inteligencia=None):
         """
         Inicializa un enemigo.
         
@@ -15,6 +16,7 @@ class Enemy:
             x: Posición X en grid
             y: Posición Y en grid
             image_path: Ruta de la imagen del enemigo
+            motor_inteligencia: Motor de movimiento (MotorInteligenciaMovimiento)
         """
         self.game = game
         self.image = pygame.image.load(image_path).convert_alpha()
@@ -29,10 +31,16 @@ class Enemy:
         
         self.speed = 0.1  # Velocidad del enemigo (movimiento suave)
         self.direction = (0, 0)  # Dirección inicial
+        
+        # Motor de inteligencia de movimiento
+        self.motor_inteligencia = motor_inteligencia if motor_inteligencia else RandomTraversal(game, self.position)
 
     def move(self):
-        """Método base para movimiento, puede ser sobrescrito por subclases."""
-        pass
+        """Método base para movimiento, delega al motor de inteligencia."""
+        # print(f"Enemigo en {self.position} calculando movimiento con motor {self.motor_inteligencia.__class__.__name__}")
+        self.motor_inteligencia.aplicar_movimiento()
+        self.position = self.motor_inteligencia.position
+        self.update()
 
     def check_collision_with_player(self, player):
         """
@@ -64,20 +72,18 @@ class Ghost(Enemy):
 
     def move(self):
         """Movimiento suave aleatorio que puede atravesar paredes."""
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-        self.direction = random.choice(directions)
-        self.position[0] = (self.position[0] + self.direction[0] * self.speed)
-        self.position[1] = (self.position[1] + self.direction[1] * self.speed)
-        # Sincronizar rect con la nueva posición
-        self.update()
+        super().move()  # El movimiento se maneja en la clase base con el motor de inteligencia
 
 
 class GhostBasic(Ghost):
-    """Enemigo fantasma básico."""
+    """Enemigo fantasma básico con motor de inteligencia aleatorio."""
     
     def __init__(self, game, x, y, image_path):
-        super().__init__(game, x, y, image_path)
-
-    def move(self):
-        """Movimiento suave básico."""
-        super().move()  # Usa el movimiento aleatorio de Ghost
+        # Crear un motor de movimiento aleatorio
+        motor = random.choice([
+            RandomTraversal(game, [x, y]),
+            TargetSeeker(game, [x, y])
+        ])
+        # print(f"Creando GhostBasic en ({x}, {y}) con motor {motor.__class__.__name__}")
+        # No llamar al super().__init__() de Ghost, sino al de Enemy con el motor
+        Enemy.__init__(self, game, x, y, image_path, motor_inteligencia=motor)
