@@ -111,9 +111,9 @@ class Player:
     
     def draw(self, screen):
         """Dibujar el jugador en la pantalla."""
-        if self.orientation == "right":
+        if self.orientation == "left":
             screen.blit(self.image, self.rect)
-        elif self.orientation == "left":
+        elif self.orientation == "right":
             flipped_image = pygame.transform.flip(self.image, True, False)
             screen.blit(flipped_image, self.rect)
     
