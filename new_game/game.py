@@ -37,6 +37,7 @@ class Game():
         self.name = ""
         self.score = 0
         self.maze = None  # Laberinto actual (se establece cuando entra en MazeGame)
+        self.maze_game = None  # Referencia a la instancia actual de MazeGame
         self.start_screen = StartScreen(self)
         self.current_screen = self.start_screen 
         self.selected_player = None

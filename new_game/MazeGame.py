@@ -3,12 +3,15 @@ from load_global_variables import *
 from ui_helpers import *
 from win_screen import WinScreen
 from game_over_screen import GameOverScreen
-from enemys import GhostBasic
+from enemys import GhostBasic, GhostMedium
 from player import Player
 
 class MazeGame:
     def __init__(self, game):
         self.game = game
+        
+        # Establecer referencia a MazeGame en el objeto game (para acceso desde enemigos)
+        self.game.maze_game = self
 
         self.window_width = game.width * CELL_SIZE  
         self.window_height = game.height * CELL_SIZE + 40  # espacio para el texto arriba
@@ -62,21 +65,31 @@ class MazeGame:
             self.game.current_screen = WinScreen(self.game)
 
     def spawn_enemies(self, amount):
-        """Genera una cantidad específica de enemigos en posiciones aleatorias."""
+        """Genera una cantidad especifica de enemigos en posiciones aleatorias."""
         player_pos = tuple(self.player.get_position_grid())
-        for _ in range(amount):
+        for i in range(amount):
             while True:
                 x = random.randint(1, self.cols - 2)
                 y = random.randint(1, self.rows - 2)
                 if self.maze[y][x] == ' ' and (y, x) != player_pos and (y, x) != self.exit:
-                    enemy = GhostBasic(self.game, x, y, self.game.basic_ghost_img_path)
+                    # Crear una mezcla de GhostBasic y GhostMedium
+                    # 60% GhostBasic, 40% GhostMedium
+                    if random.random() < 0.6:
+                        enemy = GhostBasic(self.game, x, y)
+                    else:
+                        enemy = GhostMedium(self.game, x, y)
                     self.enemies.append(enemy)
                     break
 
     def update_enemies(self):
-        """Actualiza la posición y renderiza a los enemigos."""
+        """Actualiza la posicion y renderiza a los enemigos."""
         for enemy in self.enemies:
-            enemy.move()
+            # Pasar al jugador si es un GhostMedium
+            if isinstance(enemy, GhostMedium):
+                enemy.move(self.player)
+            else:
+                enemy.move()
+            
             enemy.check_collision_with_player(self.player)
             enemy.blit(self.game.screen)
 
