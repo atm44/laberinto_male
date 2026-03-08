@@ -5,6 +5,7 @@ from win_screen import WinScreen
 from game_over_screen import GameOverScreen
 from enemys import GhostBasic, GhostMedium
 from player import Player
+from coin import Coin
 
 class MazeGame:
     def __init__(self, game):
@@ -21,7 +22,7 @@ class MazeGame:
         self.maze = [['#'] * self.cols for _ in range(self.rows)]
         self.start = (1, 1)
         self.exit = (self.rows - 2, self.cols - 2)
-        self.coins = set()
+        self.coins = []  # Lista de objetos Coin
         
         # Generar laberinto
         self.generate_maze()
@@ -109,12 +110,14 @@ class MazeGame:
         self.maze[self.exit[0]][self.exit[1]] = 'E'
 
     def spawn_coins(self, amount):
+        """Genera monedas en posiciones aleatorias del laberinto."""
         empty_spaces = [
             (r, c) for r in range(1, self.rows - 1)
             for c in range(1, self.cols - 1)
             if self.maze[r][c] == ' ' and (r, c) not in [self.start, self.exit]
         ]
-        self.coins = set(random.sample(empty_spaces, min(amount, len(empty_spaces))))
+        selected_positions = random.sample(empty_spaces, min(amount, len(empty_spaces)))
+        self.coins = [Coin(c, r) for r, c in selected_positions]  # Crear objetos Coin
 
     def draw(self):
         self.game.screen.fill(BLACK)
@@ -129,13 +132,15 @@ class MazeGame:
                 elif (row, col) == self.exit:
                     pygame.draw.rect(self.game.screen, GRAY, rect)
                     self.game.screen.blit(self.game.exit_img, (col * CELL_SIZE, row * CELL_SIZE))
-                elif (row, col) in self.coins:
-                    pygame.draw.circle(self.game.screen, (255, 215, 0), rect.center, CELL_SIZE // 3)
                 elif self.maze[row][col] == '#':
                     pygame.draw.rect(self.game.screen, WHITE, rect)
                 else:
                     pygame.draw.rect(self.game.screen, GRAY, rect)
 
+        # Dibujar monedas
+        for coin in self.coins:
+            coin.draw(self.game.screen)
+        
         # Dibujar nombre y puntuación
         score_text = f"{self.game.name}: {self.game.score}"
         score_text_size = 20
@@ -146,11 +151,16 @@ class MazeGame:
 
     def check_coin_collection(self):
         """Verificar si el jugador recolectó monedas."""
-        player_pos = tuple(self.player.get_position_grid())
-        if player_pos in self.coins:
-            self.coins.remove(player_pos)
-            # Asegurar que el puntaje no sea negativo
-            self.game.score = max(0, self.game.score + 100)
+        coins_recogidas = []
+        for coin in self.coins:
+            if coin.check_collision_with_rect(self.player.rect):
+                coins_recogidas.append(coin)
+                # Asegurar que el puntaje no sea negativo
+                self.game.score = max(0, self.game.score + 100)
+        
+        # Remover las monedas recogidas
+        for coin in coins_recogidas:
+            self.coins.remove(coin)
     
     def draw_lives(self):
         """Dibujar vidas (corazones) en la esquina inferior derecha."""
