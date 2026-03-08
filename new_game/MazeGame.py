@@ -157,6 +157,11 @@ class MazeGame:
                 coins_recogidas.append(coin)
                 # Asegurar que el puntaje no sea negativo
                 self.game.score = max(0, self.game.score + 100)
+                # Reproducir sonido de moneda
+                try:
+                    self.game.sound_coin.play()
+                except:
+                    pass  # Continuar si hay error al reproducir sonido
         
         # Remover las monedas recogidas
         for coin in coins_recogidas:

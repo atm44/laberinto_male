@@ -72,6 +72,11 @@ class Enemy:
         if self.rect.colliderect(player.rect):
             self.game.score -= 100  # El jugador pierde 100 puntos
             player.lose_life()  # Perder una vida
+            # Reproducir sonido de colisión
+            try:
+                self.game.sound_hit.play()
+            except:
+                pass  # Continuar si hay error al reproducir sonido
 
     def blit(self, screen):
         """Dibuja la imagen del enemigo en la pantalla."""

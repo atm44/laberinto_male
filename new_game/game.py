@@ -31,6 +31,10 @@ class Game():
         exit_img = pygame.image.load(os.path.join(self.img_folder,"pokeball.png")).convert_alpha()
         self.basic_ghost_img_path = os.path.join(self.img_folder,"gastly.png")       
         self.exit_img = pygame.transform.scale(exit_img, (CELL_SIZE, CELL_SIZE))
+        
+        # Cargar sonidos efectos
+        self.sound_hit = pygame.mixer.Sound(os.path.join(self.snd_folder, "hit_1.wav"))
+        self.sound_coin = pygame.mixer.Sound(os.path.join(self.snd_folder, "coin.mp3"))
 
         self.width = 15
         self.height = 15
